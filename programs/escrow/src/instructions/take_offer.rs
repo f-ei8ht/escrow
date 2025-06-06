@@ -55,7 +55,7 @@ pub struct TakeOffer<'info> {
         seeds = [b"offer", maker.key().as_ref(), offer.id.to_le_bytes().as_ref()],
         bump
     )]
-    Offer: Account<'info, Offer>,
+    offer: Account<'info, Offer>,
 
     #[account(
         mut,
@@ -77,5 +77,29 @@ pub fn take_offer_handler(context: Context<TakeOffer>) -> Result<()> {
         &context.accounts.taker_token_account_b,
         &context.accounts.maker_token_account_b,
         &context.accounts.offer.token_b_wanted_amount,
+        &context.accounts.token_mint_b,
+        &context.accounts.taker.to_account_info(),
+        &context.accounts.token_program,
+        None,
+    )?;
+    let maker_key = context.accounts.maker.key();
+    let offer_id_bytes = context.accounts.offer.id.to_le_bytes();
+
+    let offer_account_seeds: &[&[u8]] = &[
+        b"offer",
+        maker_key.as_ref(),
+        &offer_id_bytes,
+        &[context.accounts.offer.bump],
+    ];
+    let signers_seeds = Some(offer_account_seeds);
+
+    transfer_tokens(
+        &context.accounts.vault,
+        &context.accounts.taker_token_account_a,
+        &context.accounts.vault.amount,
+        &context.accounts.token_mint_a,
+        &context.accounts.offer.to_account_info(),
+        &context.accounts.token_program,
+        signers_seeds,
     )
 }
