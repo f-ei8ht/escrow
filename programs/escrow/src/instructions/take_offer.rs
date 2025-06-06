@@ -101,5 +101,13 @@ pub fn take_offer_handler(context: Context<TakeOffer>) -> Result<()> {
         &context.accounts.offer.to_account_info(),
         &context.accounts.token_program,
         signers_seeds,
+    )?;
+
+    close_token_account(
+        &context.accounts.vault,
+        &context.accounts.taker.to_account_info(),
+        &context.accounts.offer.to_account_info(),
+        &context.accounts.token_program,
+        signers_seeds,
     )
 }
