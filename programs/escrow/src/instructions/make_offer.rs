@@ -1,12 +1,13 @@
 use super::shared::transfer_tokens;
 use crate::state::Offer;
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, Discriminator};
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{Mint, TokenAccount, TokenInterface},
 };
 
 #[derive(Accounts)]
+#[instruction(id: u64)]
 pub struct MakeOffer<'info> {
     #[account(mut)]
     pub maker: Signer<'info>,
@@ -28,7 +29,7 @@ pub struct MakeOffer<'info> {
     #[account(
         init, 
         payer = maker, 
-        space = offer::DISCRIMINATOR.len() + Offer::INIT_SPACE, 
+        space = Offer::DISCRIMINATOR.len() + Offer::INIT_SPACE, 
         seeds = [b"offer", maker.key().as_ref(), id.to_le_bytes().as_ref()],
         bump
     )]
@@ -50,7 +51,7 @@ pub struct MakeOffer<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn make_offer(
+pub fn handler(
     context: Context<MakeOffer>,
     id: u64,
     token_a_offered_amount: u64,
