@@ -23,4 +23,12 @@ pub mod escrow {
     ) -> Result<()> {
         make_offer::handler(context, id, token_a_offered_amount, token_b_wanted_amount)
     }
+
+    pub fn take_offer(context: Context<TakeOffer>) -> Result<()> {
+        take_offer::take_offer_handler(context)
+    }
+
+    pub fn refund_offer(context: Context<RefundOffer>) -> Result<()> {
+        refund::refund_offer(context)
+    }
 }
